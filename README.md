@@ -1,7 +1,7 @@
-# Ex-08-Data-Visualization-
+# Ex-07-Data-Visualization-
 
 ## AIM
-To Perform Data Visualization on a complex dataset and save the data to a file. 
+To Perform Data Visualization on the given dataset and save the data to a file. 
 
 # Explanation
 Data visualization is the graphical representation of information and data. By using visual elements like charts, graphs, and maps, data visualization tools provide an accessible way to see and understand trends, outliers, and patterns in data.
@@ -16,157 +16,261 @@ Apply Feature generation and selection techniques to all the features of the dat
 ### STEP 4
 Apply data visualization techniques to identify the patterns of the data.
 
-
-# PROGRAM
-PROGRAM DEVELOPED BY : Senthil Kumar S
-
-REGISTER NUMBER : 212221230091
+# CODE
 ```
+Developed by: Senthil Kumar S
+Reg No: 212221230091
+```
+## Data Pre-Processing
+
+```py
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-
-df=pd.read_csv("Superstore.csv", encoding='windows-1252')
+```
+```py
+df = pd.read_csv("C:\Users\chief\OneDrive\Documents\Ex-08-Data-Visualization-\Superstore.csv",encoding="latin-1")
 df
-
+```
+```py
 df.head()
-
-#1.Line plot
-plt.figure(figsize=(8,5))
-sns.lineplot(x="Segment",y="Region",data=df,marker='o')
-plt.xticks(rotation = 90)
-sns.lineplot(x='Ship Mode',y='Category', hue ="Segment",data=df)
-sns.lineplot(x="Category",y="Sales",data=df,marker='o')
-
-#2.Scatterplot
-sns.scatterplot(x='Category',y='Sub-Category',data=df)
-sns.scatterplot(x='Category', y='Sub-Category', hue ="Segment",data=df)
-plt.figure(figsize=(10,7))
-sns.scatterplot(x="Region",y="Sales",data=df)
-plt.xticks(rotation = 90)
-
-#3.Boxplot
-sns.boxplot(x="Sub-Category",y="Discount",data=df)
-sns.boxplot( x="Profit", y="Category",data=df)
-
-
-#4.Barplot
-sns.barplot(x="Sub-Category",y="Sales",data=df)
-plt.xticks(rotation = 90)
-sns.barplot(x="Category",y="Sales",data=df)
-plt.xticks(rotation = 90)
-
-#5.Pointplot
-sns.pointplot(x=df["Quantity"],y=df["Discount"])
-
-#6.Count plot
-sns.countplot(x="Category",data=df)
-sns.countplot(x="Sub-aCategory",data=df)
-
-#7.Histogram
-sns.histplot(data=df,x ='Ship Mode',hue='Sub-Category')
-
-#8.KDE Plot
-sns.kdeplot(x="Profit", data = df,hue='Category')
-
-#Data Visualization Using MatPlotlib
-
-#1.Plot
-plt.plot(df['Category'], df['Sales'])
-plt.show()
-
-#2.Heatmap
-df.corr()
-plt.subplots(figsize=(12,7))
-sns.heatmap(df.corr(),annot=True)
-
-#3.Piechart
-df1=df.groupby(by=["Ship Mode"]).sum()
-labels=[]
-for i in df1.index:
-    labels.append(i)
-colors=sns.color_palette("bright")
-plt.pie(df1["Sales"],labels=labels,autopct="%0.0f%%")
-plt.show()
-
-df3=df.groupby(by=["Category"]).sum()
-labels=[]
-for i in df3.index:
-    labels.append(i) 
+```
+```py
+df.info()
+```
+```py
+df.drop('Row ID',axis=1,inplace=True)
+df.drop('Order ID',axis=1,inplace=True)
+df.drop('Customer ID',axis=1,inplace=True)
+df.drop('Customer Name',axis=1,inplace=True)
+df.drop('Country',axis=1,inplace=True)
+df.drop('Postal Code',axis=1,inplace=True)
+df.drop('Product ID',axis=1,inplace=True)
+df.drop('Product Name',axis=1,inplace=True)
+df.drop('Order Date',axis=1,inplace=True)
+df.drop('Ship Date',axis=1,inplace=True)
+print("Updated dataset")
+df
+```
+```py
+df.isnull().sum()
+```
+```py
+#detecting and removing outliers in current numeric data
 plt.figure(figsize=(8,8))
-colors = sns.color_palette('pastel')
-plt.pie(df3["Profit"],colors = colors,labels=labels, autopct = '%0.0f%%')
-plt.show()
-
-#4.Histogram
-plt.hist(df["Sub-Category"],facecolor="peru",edgecolor="blue",bins=10)
-plt.show()
-
-
-#5.Bargraph
-plt.bar(df.index,df['Category'])
-plt.show()
-
-#6.Scatterplot
-plt.scatter(df["Region"],df["Profit"], c ="blue")
-plt.show()  
-
-#7.Boxplot
-plt.boxplot(x="Sales",data=df)
+plt.title("Data with outliers")
+df.boxplot()
 plt.show()
 ```
-# OUPUT
-## Dataset
-![](data.PNG)
+```py
+plt.figure(figsize=(8,8))
+cols = ['Sales','Quantity','Discount','Profit']
+Q1 = df[cols].quantile(0.25)
+Q3 = df[cols].quantile(0.75)
+IQR = Q3 - Q1
+df = df[~((df[cols] < (Q1 - 1.5 * IQR)) |(df[cols] > (Q3 + 1.5 * IQR))).any(axis=1)]
+plt.title("Dataset after removing outliers")
+df.boxplot()
+plt.show()
+```
 
-## Head
-![](head.PNG)
+## Which Segment has Highest sales?
+```py
+sns.lineplot(x="Segment",y="Sales",data=df,marker='o')
+plt.title("Segment vs Sales")
+plt.xticks(rotation = 90)
+plt.show()
+```
+```py
+sns.barplot(x="Segment",y="Sales",data=df)
+plt.xticks(rotation = 90)
+plt.show()
+```
+## Which City has Highest profit?
+```py
+df.shape
+df1 = df[(df.Profit >= 60)]
+df1.shape
+```
+```py
+plt.figure(figsize=(30,8))
+states=df1.loc[:,["City","Profit"]]
+states=states.groupby(by=["City"]).sum().sort_values(by="Profit")
+sns.barplot(x=states.index,y="Profit",data=states)
+plt.xticks(rotation = 90)
+plt.xlabel=("City")
+plt.ylabel=("Profit")
+plt.show()
+```
 
-## Line plot 
-![](lineplot.PNG)
-## Scatter plot 1
-![](scatterplot1.PNG)
-
-## Box plot 1
-![](boxplot1.PNG)
-
-## Bar plot 
-![](barplot.PNG)
-
-## Point plot 
-![](pointplot.PNG)
-## Count plot 
-![](countplot.PNG)
-
-## Histogram plot 1
-![](histogramplot1.PNG)
-
-## KDE plot 
-![](kdeplot.PNG)
-
-## Data Visualization Using MatPlotlib
-## Plot
-![](plot.PNG)
-
+## Which ship mode is profitable?
+```py
+sns.barplot(x="Ship Mode",y="Profit",data=df)
+plt.show()
+```
+```py
+sns.lineplot(x="Ship Mode",y="Profit",data=df)
+plt.show()
+```
+```py
+sns.violinplot(x="Profit",y="Ship Mode",data=df)
+```
+```py
+sns.pointplot(x=df["Profit"],y=df["Ship Mode"])
+```
+## Sales of the product based on region.
+```py
+states=df.loc[:,["Region","Sales"]]
+states=states.groupby(by=["Region"]).sum().sort_values(by="Sales")
+sns.barplot(x=states.index,y="Sales",data=states)
+plt.xticks(rotation = 90)
+plt.xlabel=("Region")
+plt.ylabel=("Sales")
+plt.show()
+```
+```py
+df.groupby(['Region']).sum().plot(kind='pie', y='Sales',figsize=(6,9),pctdistance=1.7,labeldistance=1.2)
+```
+## Find the relation between sales and profit.
+```py
+df["Sales"].corr(df["Profit"])
+```
+```py
+df_corr = df.copy()
+df_corr = df_corr[["Sales","Profit"]]
+df_corr.corr()
+```
+```py
+sns.pairplot(df_corr, kind="scatter")
+plt.show()
+```
 ## Heatmap
-![](heatmap.PNG)
+```py
+df4=df.copy()
 
-## Pie chart
-![](piechart1.PNG)
-![](piechart2.PNG)
+#encoding
+from sklearn.preprocessing import LabelEncoder,OrdinalEncoder,OneHotEncoder
+le=LabelEncoder()
+ohe=OneHotEncoder
+oe=OrdinalEncoder()
 
-## Histogram plot 2
-![](histogramplot2.PNG)
+df4["Ship Mode"]=oe.fit_transform(df[["Ship Mode"]])
+df4["Segment"]=oe.fit_transform(df[["Segment"]])
+df4["City"]=le.fit_transform(df[["City"]])
+df4["State"]=le.fit_transform(df[["State"]])
+df4['Region'] = oe.fit_transform(df[['Region']])
+df4["Category"]=oe.fit_transform(df[["Category"]])
+df4["Sub-Category"]=le.fit_transform(df[["Sub-Category"]])
 
-## Bar graph
-![](bargraph.PNG)
+#scaling
+from sklearn.preprocessing import RobustScaler
+sc=RobustScaler()
+df5=pd.DataFrame(sc.fit_transform(df4),columns=['Ship Mode', 'Segment', 'City', 'State','Region',
+                                               'Category','Sub-Category','Sales','Quantity','Discount','Profit'])
 
-## Scatter plot 2
-![](scatterplot2.PNG)
+#Heatmap
+plt.subplots(figsize=(12,7))
+sns.heatmap(df5.corr(),cmap="PuBu",annot=True)
+plt.show()
+```
+## Find the relation between sales and profit based on the following category.
 
-## Box plot 2
-![](boxplot2.PNG)
+### Segment
+```py
+df_corr = df5.copy()
+df_corr = df_corr[["Sales","Profit","Segment"]]
+df_corr.corr()
+```
+### City
+```py
+df_corr = df5.copy()
+df_corr = df_corr[["Sales","Profit","City"]]
+df_corr.corr()
+```
+### States
+```py
+df_corr = df5.copy()
+df_corr = df_corr[["Sales","Profit","State"]]
+df_corr.corr()
+```
+### Segment and Ship Mode
+```py
+df_corr = df5.copy()
+df_corr = df_corr[["Sales","Profit","Segment","Ship Mode"]]
+df_corr.corr()
+```
+### Segment, Ship mode and Region
+```py
+df_corr = df5.copy()
+df_corr = df_corr[["Sales","Profit","Segment","Ship Mode","Region"]]
+df_corr.corr()
+```
 
-# RESULT
-Hence, Data Visualization is applied on the complex dataset using libraries like Seaborn and Matplotlib successfully and the data is saved to file.
+# OUPUT
+## Data Pre-Processing
+![Df](./out/df.png)</br>
+![Df](./out/head.png)</br>
+![Df](./out/info.png)</br>
+![Df](./out/null.png)</br>
+![Df](./out/shape.png)</br>
+![Df](./out/updateddf.png)</br>
+![Df](./out/withoutliers.png)</br>
+![Df](./out/withoutoutliers.png)
+## Which Segment has Highest sales?
+![Df](./out/1/1.png)
+![Df](./out/1/2.png)
+## Which City has Highest profit?
+![Df](./out/2/1.png)
+![Df](./out/2/2.png)
+## Which ship mode is profitable?
+![Df](./out/3/1.png)
+![Df](./out/3/2.png)
+![Df](./out/3/3.png)
+![Df](./out/3/4.png)
+## Sales of the product based on region.
+![Df](./out/4/1.png)
+![Df](./out/4/2.png)
+## Find the relation between sales and profit
+![Df](./out/5/1.png)</br>
+![Df](./out/5/3.png)</br>
+![Df](./out/5/2.png)
+## Heatmap
+![Df](./out/heat.png)
+## Find the relation between sales and profit based on the following category.
+
+### Segment
+![Df](./out/6/1.png)
+### City
+![Df](./out/6/2.png)
+### States
+![Df](./out/6/3.png)
+### Segment and Ship Mode
+![Df](./out/6/4.png)
+### Segment, Ship mode and Region
+![Df](./out/6/5.png)
+
+# Result:
+Thus, Data Visualization is performed on the given dataset and save the data to a file.
+## Inferences
+## Which Segment has Highest sales?
+**Consumer Segment has the highest sales**
+## Which City has Highest profit?
+**New York City has the Highest Profit**
+## Which ship mode is profitable?
+**First Class Ship Mode is most profitable**
+## Sales of the product based on region.
+**West region has the most sales**
+## Find the relation between sales and profit
+**Sales is not much related to profit**
+## Find the relation between sales and profit based on the following category.
+### Segment
+**Profit is much related to Segment than Sales**
+### City
+**Profit is much related to City than Sales**
+### States
+**Sales is much related to City than Profit**
+### Segment and Ship Mode
+**Ship mode is more related to Sales than Profit**
+### Segment, Ship mode and Region
+**Region is more related to Profit than Sales**
