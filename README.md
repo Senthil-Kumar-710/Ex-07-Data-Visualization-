@@ -271,6 +271,6 @@ Thus, Data Visualization is performed on the given dataset and save the data to 
 ### States
 **Sales is much related to City than Profit**
 ### Segment and Ship Mode
-**Ship mode is more related to Sales than Profit**
+**Ship mode is more related to Sales than Profit.**
 ### Segment, Ship mode and Region
 **Region is more related to Profit than Sales.**
